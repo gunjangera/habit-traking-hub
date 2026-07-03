@@ -1,97 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Productivity Hub</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Productivity Tracker</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <header>
-        <div class="logo-section">
-            <img src="images/logo.png" alt="Student Productivity Hub Logo" class="logo">
-            <h1>Student Productivity Hub</h1>
+<a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand-section">
+        <div class="logo-box">
+          <img src="logo.png" alt="App Logo" class="app-logo" />
+        </div>
+        <div class="brand-text">
+          <h1>StudyTrack</h1>
+          <p>Student Productivity App</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active">Dashboard</a>
+        <a href="#" class="nav-link">Habits</a>
+        <a href="#" class="nav-link">Week View</a>
+        <a href="#" class="nav-link">Progress</a>
+      </nav>
+
+      <div class="quote-card">
+        <h3>Daily Motivation</h3>
+        <p>Discipline today creates success tomorrow.</p>
+      </div>
+    </aside>
+
+    <main class="main-content" id="main">
+      <header class="topbar">
+        <div>
+          <p class="small-label">Welcome back</p>
+          <h2>Track your habits and progress</h2>
+        </div>
+        <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+      </header>
+
+      <section class="summary-grid">
+        <div class="card primary-card">
+          <p class="card-label">Today's Date</p>
+          <h3 id="todayDate">Loading...</h3>
+          <p class="muted-text">Stay focused and finish your daily goals.</p>
         </div>
 
-        <div class="head">
-            <p id="date">Thursday, July 2, 2026</p>
+        <div class="card">
+          <p class="card-label">Completed Habits</p>
+          <h3><span id="completedCount">0</span>/<span id="totalCount">0</span></h3>
+          <p class="muted-text">Tasks finished today</p>
         </div>
 
-    </header>
-    <div class="container">
-        <aside id="sidebar">
-            <div class="profile">
-                <img src="images/profile.png" alt="Profile Image" class="profile-img">
-                <h2>Gunjan</h2>
-                <p>Computer Science Student</p>
+        <div class="card">
+          <p class="card-label">Progress</p>
+          <h3 id="progressPercent">0%</h3>
+          <p class="muted-text">Your daily completion rate</p>
+        </div>
+      </section>
+
+      <section class="card week-card">
+        <div class="week-header">
+          <div>
+            <p class="card-label">Week Navigation</p>
+            <h3 id="weekTitle">Week 1</h3>
+            <p class="muted-text" id="fullDate">Loading date...</p>
+          </div>
+
+          <div class="week-buttons">
+            <button id="prevWeek" type="button">←</button>
+            <button id="nextWeek" type="button">→</button>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-top">
+            <span>Daily Progress</span>
+            <strong id="progressText">0%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="days-grid" id="daysGrid"></div>
+      </section>
+
+      <section class="main-grid">
+        <section class="card">
+          <div class="section-header">
+            <div>
+              <p class="card-label">Habit Checklist</p>
+              <h3>Today's Habits</h3>
             </div>
-            <nav>
-                <ul>
-                    <li>🏠 Dashboard</li>
-                    <li>✅ Tasks</li>
-                    <li>📅 Planner</li>
-                    <li>📊 Habit Tracker</li>
-                    <li>⏳ Pomodoro</li>
-                    <li>📝 Notes</li>
-                    <li>🎯 Goals</li>
-                    <li>⚙️ Settings</li>
-                </ul>
-            </nav>
-        </aside>
-        <main>
-            <section class="welcome">
-                <h2>Good Morning, Gunjan 👋</h2>
-                <p>
-                    Stay consistent. Small progress every day leads to big success.
-                </p>
-            </section>
-            <section id="goal">
-                <h3>🎯 Today's Goal</h3>
-                <p>Complete 2 LeetCode problems.</p>
-            </section>
+          </div>
 
-            <section id="progress">
-                <h3>📊 Today's Progress</h3>
-                <p>0% Completed</p>
-            </section>
+          <div id="habitList" class="habit-list">
+            <div class="habit-item">
+              <label class="habit-left">
+                <input type="checkbox" class="habit-check">
+                <span class="custom-check"></span>
+                <span class="habit-text">Study for 2 hours</span>
+              </label>
+              <button class="delete-btn" type="button">✕</button>
+            </div>
 
-            <section id="tasks">
-                <h3>✅ Today's Tasks</h3>
-                <ul>
-                    <li>Revise JavaScript</li>
-                    <li>Practice DSA</li>
-                    <li>Read 20 minutes</li>
-                    <li>Exercise</li>
-                </ul>
+            <div class="habit-item">
+              <label class="habit-left">
+                <input type="checkbox" class="habit-check">
+                <span class="custom-check"></span>
+                <span class="habit-text">Revise class notes</span>
+              </label>
+              <button class="delete-btn" type="button">✕</button>
+            </div>
 
-            </section>
-            <section id="habits">
+            <div class="habit-item">
+              <label class="habit-left">
+                <input type="checkbox" class="habit-check">
+                <span class="custom-check"></span>
+                <span class="habit-text">Practice coding</span>
+              </label>
+              <button class="delete-btn" type="button">✕</button>
+            </div>
 
-                <h3>🔥 Habit Tracker</h3>
-                <p>DSA | Reading | English | Exercise</p>
-            </section>
+            <div class="habit-item">
+              <label class="habit-left">
+                <input type="checkbox" class="habit-check">
+                <span class="custom-check"></span>
+                <span class="habit-text">Read 10 pages</span>
+              </label>
+              <button class="delete-btn" type="button">✕</button>
+            </div>
+          </div>
+        </section>
 
-            <section id="timer">
-                <h3>⏳ Pomodoro Timer</h3>
-                <p>25 : 00</p>
-                <button>Start</button>
-                <button>Pause</button>
-                <button>Reset</button>
-            </section>
+        <section class="card add-habit-card">
+          <p class="card-label">Add Habit</p>
+          <h3>Create a new habit</h3>
 
-            <section id="quote">
-                <h3>💡 Quote of the Day</h3>
+          <div class="add-habit-box">
+            <input type="text" id="habitInput" placeholder="Enter a new habit">
+            <button id="addHabit" type="button">Add Habit</button>
+          </div>
 
-                <blockquote>
-                    "Discipline is choosing between what you want now and what you want most."
-                </blockquote>
-            </section>
-        </main>
+          <div class="tips-box">
+            <h4>Tips</h4>
+            <ul>
+              <li>Add habits that are small and realistic.</li>
+              <li>Track them daily for better consistency.</li>
+              <li>Use weekly view to review your routine.</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
 
-    </div>
-
-    <script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>

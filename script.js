@@ -1,113 +1,162 @@
-const dateEl = document.getElementById("date");
-const welcomeHeading = document.querySelector(".welcome h2");
-const progressText = document.querySelector("#progress p");
-const taskItems = document.querySelectorAll("#tasks ul li");
+const todayDate = document.getElementById("todayDate");
+const completedCount = document.getElementById("completedCount");
+const totalCount = document.getElementById("totalCount");
+const progressPercent = document.getElementById("progressPercent");
+const progressText = document.getElementById("progressText");
+const progressFill = document.getElementById("progressFill");
+const fullDate = document.getElementById("fullDate");
+const weekTitle = document.getElementById("weekTitle");
+const daysGrid = document.getElementById("daysGrid");
+const prevWeek = document.getElementById("prevWeek");
+const nextWeek = document.getElementById("nextWeek");
+const habitList = document.getElementById("habitList");
+const habitInput = document.getElementById("habitInput");
+const addHabit = document.getElementById("addHabit");
+const themeToggle = document.getElementById("themeToggle");
 
-const timerSection = document.getElementById("timer");
-const timerDisplay = timerSection.querySelector("p");
-const buttons = timerSection.querySelectorAll("button");
+let currentDate = new Date();
 
-const startBtn = buttons[0];
-const pauseBtn = buttons[1];
-const resetBtn = buttons[2];
-
-let totalSeconds = 25 * 60;
-let timer = null;
-let isRunning = false;
-
-/* Date */
-function updateDate() {
-    const today = new Date();
-    const options = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    };
-    dateEl.textContent = today.toLocaleDateString("en-US", options);
+function formatFullDate(date) {
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
 }
 
-/* Greeting */
-function updateGreeting() {
-    const hour = new Date().getHours();
-    let greeting = "Good Morning";
+function getStartOfWeek(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
 
-    if (hour >= 12 && hour < 17) {
-        greeting = "Good Afternoon";
-    } else if (hour >= 17) {
-        greeting = "Good Evening";
+function getWeekNumber(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function renderWeek(date) {
+  const start = getStartOfWeek(date);
+  const weekNo = getWeekNumber(date);
+
+  weekTitle.textContent = `Week ${weekNo}`;
+  fullDate.textContent = formatFullDate(date);
+  todayDate.textContent = formatFullDate(date);
+
+  daysGrid.innerHTML = "";
+
+  for (let i = 0; i < 7; i++) {
+    const dayDate = new Date(start);
+    dayDate.setDate(start.getDate() + i);
+
+    const dayBox = document.createElement("div");
+    dayBox.className = "day-box";
+
+    if (dayDate.toDateString() === new Date().toDateString()) {
+      dayBox.classList.add("active");
     }
 
-    welcomeHeading.textContent = `${greeting}, Gunjan 👋`;
+    dayBox.innerHTML = `
+      <span>${dayDate.toLocaleDateString("en-US", { weekday: "short" })}</span>
+      <strong>${String(dayDate.getDate()).padStart(2, "0")}</strong>
+    `;
+
+    daysGrid.appendChild(dayBox);
+  }
 }
 
-/* Progress */
 function updateProgress() {
-    const completedTasks = document.querySelectorAll("#tasks ul li.completed").length;
-    const totalTasks = taskItems.length;
-    const percent = Math.round((completedTasks / totalTasks) * 100);
+  const checks = document.querySelectorAll(".habit-check");
+  const checked = document.querySelectorAll(".habit-check:checked");
 
-    progressText.textContent = `${percent}% Completed`;
+  totalCount.textContent = checks.length;
+  completedCount.textContent = checked.length;
+
+  const percent = checks.length === 0 ? 0 : Math.round((checked.length / checks.length) * 100);
+
+  progressPercent.textContent = percent + "%";
+  progressText.textContent = percent + "%";
+  progressFill.style.width = percent + "%";
 }
 
-/* Task toggle */
-taskItems.forEach((item) => {
-    item.addEventListener("click", () => {
-        item.classList.toggle("completed");
-        updateProgress();
-    });
+function createHabitItem(habitText) {
+  const item = document.createElement("div");
+  item.className = "habit-item";
+
+  item.innerHTML = `
+    <label class="habit-left">
+      <input type="checkbox" class="habit-check">
+      <span class="custom-check"></span>
+      <span class="habit-text"></span>
+    </label>
+    <button class="delete-btn" type="button">✕</button>
+  `;
+
+  item.querySelector(".habit-text").textContent = habitText;
+
+  const checkbox = item.querySelector(".habit-check");
+  const deleteBtn = item.querySelector(".delete-btn");
+
+  checkbox.addEventListener("change", updateProgress);
+
+  deleteBtn.addEventListener("click", function () {
+    item.remove();
+    updateProgress();
+  });
+
+  return item;
+}
+
+document.querySelectorAll(".habit-item").forEach((item) => {
+  const checkbox = item.querySelector(".habit-check");
+  const deleteBtn = item.querySelector(".delete-btn");
+
+  checkbox.addEventListener("change", updateProgress);
+
+  deleteBtn.addEventListener("click", function () {
+    item.remove();
+    updateProgress();
+  });
 });
 
-/* Timer format */
-function formatTime(seconds) {
-    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const secs = String(seconds % 60).padStart(2, "0");
-    return `${mins} : ${secs}`;
-}
+addHabit.addEventListener("click", function () {
+  const text = habitInput.value.trim();
 
-/* Timer display update */
-function updateTimerDisplay() {
-    timerDisplay.textContent = formatTime(totalSeconds);
-}
+  if (text === "") return;
 
-/* Start timer */
-function startTimer() {
-    if (isRunning) return;
+  const newHabit = createHabitItem(text);
+  habitList.appendChild(newHabit);
+  habitInput.value = "";
+  updateProgress();
+});
 
-    isRunning = true;
-    timer = setInterval(() => {
-        if (totalSeconds > 0) {
-            totalSeconds--;
-            updateTimerDisplay();
-        } else {
-            clearInterval(timer);
-            isRunning = false;
-            alert("Pomodoro session completed!");
-        }
-    }, 1000);
-}
+habitInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    addHabit.click();
+  }
+});
 
-/* Pause timer */
-function pauseTimer() {
-    clearInterval(timer);
-    isRunning = false;
-}
+prevWeek.addEventListener("click", function () {
+  currentDate.setDate(currentDate.getDate() - 7);
+  renderWeek(currentDate);
+});
 
-/* Reset timer */
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    totalSeconds = 25 * 60;
-    updateTimerDisplay();
-}
+nextWeek.addEventListener("click", function () {
+  currentDate.setDate(currentDate.getDate() + 7);
+  renderWeek(currentDate);
+});
 
-/* Button events */
-startBtn.addEventListener("click", startTimer);
-pauseBtn.addEventListener("click", pauseTimer);
-resetBtn.addEventListener("click", resetTimer);
+themeToggle.addEventListener("click", function () {
+  document.body.classList.toggle("dark");
+  themeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+});
 
-/* Initial load */
-updateDate();
-updateGreeting();
+renderWeek(currentDate);
 updateProgress();
-updateTimerDisplay();
